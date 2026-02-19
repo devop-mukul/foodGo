@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const mongoURI = "mongodb+srv://armukul01_db_user:Mukulmongodb11@clusterprojects.i9fd98w.mongodb.net/foodGoMERN?appName=ClusterProjects"
 
 const mongoDB = async() => {
     //     await mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true }, (err, result) => {
@@ -9,7 +8,7 @@ const mongoDB = async() => {
     //         console.log("Connected to MongoDB successfully!")
     // });
     try {
-        await mongoose.connect(mongoURI);
+        await mongoose.connect(process.env.MONGO_URI);
         console.log("MongoDB Connected Successfully");
         const fetchedData = await mongoose.connection.db
             .collection("food_items")
