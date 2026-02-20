@@ -3,7 +3,17 @@ const router = express.Router()
 const User = require('../models/User')
 // const bcrypt = require('bcryptjs')
 
-router.post('/createuser', async (req, res) => {
+const { body, validationResult } = require('express-validator')
+
+router.post('/createuser', 
+    body('email', "Invalid Email").isEmail(),
+    body('password', "Incorrect Password").isLength({ min: 8 }),
+    async (req, res) => {
+
+        const errors = validationResult(req)
+        if(!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() })
+        }
     try {
         await User.create({
             name: req.body.name,
