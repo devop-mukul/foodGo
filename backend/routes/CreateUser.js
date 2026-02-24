@@ -1,7 +1,9 @@
 const express = require('express')
 const router = express.Router()
 const User = require('../models/User')
-// const bcrypt = require('bcryptjs')
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const jwtSecret = process.env.JWT_SECRET
 
 const { body, validationResult } = require('express-validator')
 
@@ -15,10 +17,14 @@ router.post('/createuser', [
             return res.status(400).json({ errors: errors.array() })
         }
 
+        //most bcrypt functions are asynchronous
+        const salt = await bcrypt.genSalt(10);
+        const securePassword = await bcrypt.hash(req.body.password, salt);
+
         try {
             await User.create({
                 name: req.body.name,
-                password: req.body.password,
+                password: securePassword,
                 email: req.body.email,
                 location: req.body.location
             })
@@ -29,8 +35,9 @@ router.post('/createuser', [
         }
     })
 
-router.post('/loginuser', [body('email', "Invalid Email").isEmail(),
-body('password', "Incorrect Password").isLength({ min: 8 })],
+router.post('/loginuser',
+    [body('email', "Invalid Email").isEmail(),
+    body('password', "Incorrect Password").isLength({ min: 8 })],
     async (req, res) => {
 
         const errors = validationResult(req)
@@ -40,19 +47,27 @@ body('password', "Incorrect Password").isLength({ min: 8 })],
 
         let email = req.body.email;
         try {
-            let userdata = await User.findOne({ email })
-            if (!userdata) {
+            let userData = await User.findOne({ email })
+            if (!userData) {
                 return res.status(400).json({ errors: "Try logging in with correct credentials" })
             }
 
-            if (req.body.password !== userdata.password) {
+            const pwdCompare = await bcrypt.compare(req.body.password, userData.password);
+            if (!pwdCompare) {
                 return res.status(400).json({ errors: "Try logging in with correct credentials" })
             }
 
-            return res.json({ success: true })
+            const data = {
+                user: {
+                    id: userData.id
+                }
+            }
 
+            const authToken = jwt.sign(data, jwtSecret, { expiresIn: '15 days' })
+            return res.json({ success: true, authToken: authToken })
         } catch (err) {
             console.log(err)
+            res.json({ success: false });
         }
     })
 
