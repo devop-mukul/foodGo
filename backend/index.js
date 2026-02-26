@@ -11,6 +11,9 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:3000'); // Allow requests from any origin
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE'); // Allow specific HTTP methods
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept'); // Allow specific headers
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end(); // ← respond to preflight and stop
+    }
     next();
 })
 

@@ -10,13 +10,16 @@ const mongoDB = async () => {
     try {
         await mongoose.connect(process.env.MONGO_URI);
         console.log("MongoDB Connected Successfully");
-        const fetchedData = await mongoose.connection.db
+        global.food_items = await mongoose.connection.db
             .collection("food_items")
             .find({})
             .toArray();
 
-        global.food_items = fetchedData;
-        // console.log(fetchedData);
+        global.food_category = await mongoose.connection.db
+            .collection("food_category")
+            .find({})
+            .toArray();
+        
     } catch (error) {
         console.error("MongoDB Connection Failed:", error);
         process.exit(1); // Exit the process with an error code
