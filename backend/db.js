@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const mongoDB = async() => {
+const mongoDB = async () => {
     //     await mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true }, (err, result) => {
     //         if(err) {
     //             console.log("Error connecting to MongoDB: ", err)
@@ -14,6 +14,8 @@ const mongoDB = async() => {
             .collection("food_items")
             .find({})
             .toArray();
+
+        global.food_items = fetchedData;
         // console.log(fetchedData);
     } catch (error) {
         console.error("MongoDB Connection Failed:", error);

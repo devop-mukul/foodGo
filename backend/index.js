@@ -19,7 +19,8 @@ app.get('/', (req, res) => {
 })
 
 app.use(express.json()) //middleware to parse JSON bodies
-app.use('/api', require('./routes/CreateUser')) //use create user route
+app.use('/api', require('./routes/CreateUser')) //create user route
+app.use('/api', require('./routes/DisplayData')) //display food_items route
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}!`)
